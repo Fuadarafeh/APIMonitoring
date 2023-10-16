@@ -1,0 +1,124 @@
+from selenium import webdriver
+from time import *
+from selenium.webdriver import ActionChains
+from Config import *
+#from pytest#_testrail.plugin import# testrail
+
+
+Path = "C:\Program Files (x86)\chromedriver.exe"
+# global driver
+driver = webdriver.Chrome(Path)
+
+
+#@testrail('344479')
+def test_Open_Webclient():
+    #Call OneTv Url
+    driver.get("https://ID4Entertainment:id4test1234@tv.magenta.at")
+    sleep(2)
+
+
+
+#@testrail('344480')
+def test_Maximize_webclient():
+    driver.maximize_window()
+
+#@testrail('344481')
+def test_Accep_cookies():
+    driver.find_element_by_css_selector('button[class="styles__ButtonStyled-sc-1v6p797-0 gvnQjZ"]').click()
+
+
+
+#@testrail('344482')
+def test_Login():
+    #Login using one of Prod accounts
+    driver.implicitly_wait(1)
+    driver.find_element_by_xpath('//body[1]/div[1]/div[1]/nav[1]/div[1]/section[1]/div[3]').click()
+    driver.implicitly_wait(3)
+    driver.find_element_by_xpath('//body[1]/div[4]/div[1]/div[1]/div[1]/div[1]/article[1]/div[1]/article[1]/article[1]/button[1]').click()
+    driver.implicitly_wait(2)
+    driver.find_element_by_xpath('//body[1]/div[4]/div[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/form[1]/div[1]/div[1]/input[1]').send_keys("id4aliaswatch0204@shooting-sport.com")
+    driver.find_element_by_xpath('//body[1]/div[4]/div[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/form[1]/div[2]/div[1]/input[1]').send_keys("ID4EntertainmentProdukt")
+    driver.find_element_by_css_selector('button[type="submit"]').click()
+    sleep(5)
+
+def test_player():
+    # click on EPG
+    driver.implicitly_wait(3)
+    driver.find_element_by_xpath("//div[@class='styles__EPGLogoStyled-sc-139bdmk-0 itvZGB']").click()
+    sleep(4)
+
+    #display channel list, and click on a specific channel
+    # for channel in driver.find_elements_by_xpath(Config.channelList):
+    #     print(channel.find_element_by_xpath("div").text)
+    #     channelNum = channel.find_element_by_xpath("div").text
+    #     if channelNum == "011":
+    #         channel.click()
+    # sleep(10)
+
+
+
+    # click on channel ORF 1 HD
+    driver.find_element_by_xpath(Config.ORF1HD).click()
+    sleep(10)
+    # click on the settings option - need to hover with mouse
+    ActionChains(driver).move_by_offset(50, 50).perform()
+    sleep(5)
+    driver.find_element_by_xpath(Config.settings).click()
+    sleep(2)
+    driver.find_element_by_xpath(Config.settings).click()
+    driver.implicitly_wait(8)
+
+def test_info():
+    # click on info
+    driver.find_element_by_xpath(Config.info).click()
+    sleep(2)
+    driver.implicitly_wait(5)
+    # check show name
+    metadata = driver.find_element_by_xpath(Config.info_metadata).text
+    print(metadata)
+    sleep(3)
+    driver.find_element_by_xpath(Config.info_close).click()
+    sleep(2)
+    # Mute audio
+    driver.find_element_by_xpath(Config.audio).click()
+
+def test_audio_playout():
+    assert test_audio() == "Audio is Muted"
+    sleep(1)
+
+def test_video_playout():
+    # Pause Video
+    driver.find_element_by_xpath(Config.pause).click()
+    assert test_video() == "Video is paused"
+    sleep(2)
+    driver.find_element_by_xpath(Config.pause).click()
+    driver.find_element_by_xpath(Config.audio).click()
+
+
+
+
+
+    # if driver.find_element_by_class_name('styles__StyledLoader-sc-19tzc03-0 gayaFg'):
+    #     print("object found")
+
+# Print images with display issues
+def test_video():
+    imgs = driver.find_elements_by_xpath("//img")
+    for img in imgs:
+        if Config.action_play1 in img.get_attribute("src"):
+            return 'Video is playing'
+            print('Video is playing')
+        elif Config.action_pause1 in img.get_attribute("src"):
+            return 'Video is paused'
+            print('Video is paused')
+
+
+def test_audio():
+    imgs = driver.find_elements_by_xpath("//img")
+    for img in imgs:
+        if Config.action_sound in img.get_attribute("src"):
+            return 'Audio is playing'
+            print('Audio is playing')
+        elif Config.action_mute in img.get_attribute("src"):
+            return 'Audio is Muted'
+            print('Audio is Muted')
